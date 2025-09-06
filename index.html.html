@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Quản trò Ma Sói</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+    h2 { margin-top: 40px; color: #333; }
+    h3 { margin-top: 20px; color: #444; }
+    textarea { width: 100%; padding: 10px; font-size: 16px; margin-top: 10px; border: 1px solid #ccc; border-radius: 8px; }
+    button { margin-top: 10px; padding: 8px 15px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+    button:hover { background: #0056b3; }
+    .roles-container { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; }
+    .role-option { border: 2px solid #ccc; border-radius: 8px; text-align: center; padding: 5px; width: 100px; cursor: pointer; background: white; transition: 0.2s; }
+    .role-option:hover { border-color: #007bff; transform: scale(1.05); }
+    .role-option img { width: 80px; height: 80px; object-fit: contain; margin: 0 auto 5px; display: block; }
+    .roles-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; margin-top: 20px; }
+    .role-card { border: 1px solid #ccc; border-radius: 10px; padding: 10px; text-align: center; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.1); font-size: 16px; }
+    .role-card img { width: 70px; height: 70px; object-fit: contain; margin-bottom: 8px; }
+    .player-name { font-weight: bold; margin-bottom: 5px; font-size: 18px; color: #222; }
+    table { border-collapse: collapse; width: 100%; margin-top: 10px; background: #fff; }
+    table, th, td { border: 1px solid #ccc; }
+    th, td { padding: 6px; text-align: center; }
+    input[type="text"], select { width: 95%; padding: 5px; font-size: 14px; }
+    .section-title { font-size: 20px; font-weight: bold; margin-bottom: 10px; color: #0056b3; }
+    .night-box { border: 1px solid #aaa; padding: 10px; border-radius: 8px; margin-bottom: 15px; background: #fff; }
+    .night-header { display: flex; justify-content: space-between; align-items: center; }
+    .delete-btn { background: #dc3545; margin: 0; }
+    .delete-btn:hover { background: #b52a37; }
+
+    /* layout div1 và div2 */
+    .top-section { display: flex; gap: 20px; align-items: flex-start; margin-bottom: 20px; }
+    .players-section, .roles-section {
+      background: #fff;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .players-section { width: 30%; }
+    .roles-section { width: 70%; }
+
+    /* Màu header theo vai trò */
+    th { color: #fff; font-weight: bold; }
+    th:nth-child(1) { background: #28a745; }   /* Bảo vệ */
+    th:nth-child(2) { background: #dc3545; }   /* Sói */
+    th:nth-child(3) { background: #e83e8c; }   /* Phù thủy */
+    th:nth-child(4) { background: #6f42c1; }   /* Tiên tri */
+    th:nth-child(5) { background: #fd7e14; }   /* Thợ săn */
+  </style>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+</head>
+<body>
+  <h1>🎭 Quản trò Ma Sói</h1>
+
+  <!-- Người chơi + Chọn vai trò -->
+  <div class="top-section">
+    <!-- Người chơi -->
+    <div class="players-section">
+      <div class="section-title">1️⃣ Người chơi</div>
+      <textarea id="playerInput" rows="12" placeholder="Nhập tên người chơi, mỗi dòng 1 tên"></textarea>
+    </div>
+
+    <!-- Chọn vai trò -->
+    <div class="roles-section">
+      <div class="section-title">2️⃣ Chọn vai trò</div>
+      <div class="roles-container" id="roleSelection"></div>
+    </div>
+  </div>
+
+  <!-- Random chia vai trò -->
+  <div>
+    <div class="section-title">3️⃣ Random chia vai trò</div>
+    <button onclick="confirmRandom()">🎲 Random</button>
+    <div id="result" class="roles-grid"></div>
+  </div>
+
+  <!-- Nhật ký ban đêm -->
+  <div>
+    <div class="section-title">4️⃣ Nhật ký ban đêm</div>
+    <div id="nightsContainer"></div>
+    <button onclick="addNight()">➕ Thêm đêm</button>
+  </div>
+
+  <script>
+    const roles = [
+      { name: "Dân làng", img: "img/1.png" },
+      { name: "Dân làng", img: "img/1.png" },
+      { name: "Dân làng", img: "img/1.png" },
+      { name: "Dân làng", img: "img/1.png" },
+      { name: "Tiên tri", img: "img/2.png" },
+      { name: "Bảo vệ", img: "img/3.png" },
+      { name: "Thợ săn", img: "img/4.png" },
+      { name: "Phù thủy", img: "img/5.png" },
+      { name: "Thần tình yêu", img: "img/6.png" },
+      { name: "Già làng", img: "img/15.png" },
+      { name: "Người hóa sói", img: "img/7.png" },
+      { name: "Sói", img: "img/8.png" },
+      { name: "Sói", img: "img/8.png" },
+      { name: "Sói", img: "img/8.png" },
+      { name: "Sói", img: "img/8.png" },
+      { name: "Bán Sói", img: "img/9.png" },
+      { name: "Sói trắng", img: "img/10.png" },
+      { name: "Sói nguyền", img: "img/11.png" },
+      { name: "Sói tuyết", img: "img/12.png" },
+      { name: "Sói gây mê", img: "img/16.png" },
+      { name: "Nhân bản", img: "img/13.png" },
+      { name: "Sát thủ", img: "img/14.png" }
+    ];
+
+    const selectedRoles = [];
+    let playersList = [];
+    let nightCount = 0;
+    let hasRandomed = false;
+
+    // Render danh sách lá bài
+    const roleContainer = document.getElementById("roleSelection");
+    roles.forEach((role, index) => {
+      const div = document.createElement("div");
+      div.className = "role-option";
+      div.innerHTML = `<img src="${role.img}" alt="${role.name}"><div>${role.name}</div>`;
+      div.onclick = () => toggleRole(index, div);
+      roleContainer.appendChild(div);
+    });
+
+    function toggleRole(index, div) {
+      const role = roles[index];
+      const pos = selectedRoles.indexOf(role);
+      if (pos === -1) {
+        selectedRoles.push(role);
+        div.style.borderColor = "#007bff";
+      } else {
+        selectedRoles.splice(pos, 1);
+        div.style.borderColor = "#ccc";
+      }
+    }
+
+    function shuffle(array) {
+      let currentIndex = array.length, randomIndex;
+      while (currentIndex !== 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+        [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+      }
+      return array;
+    }
+
+    function confirmRandom() {
+      savePlayers();
+      if (!hasRandomed) {
+        assignRoles();
+        hasRandomed = true;
+      } else {
+        if (confirm("Bạn có muốn sắp xếp lại chức năng không ?")) {
+          assignRoles();
+        }
+      }
+    }
+
+    function assignRoles() {
+      if (playersList.length !== selectedRoles.length) {
+        alert("❌ Số người chơi phải bằng số vai trò đã chọn!");
+        return;
+      }
+      const shuffledRoles = shuffle([...selectedRoles]);
+      const resultDiv = document.getElementById("result");
+      resultDiv.innerHTML = "";
+      playersList.forEach((player, i) => {
+        const role = shuffledRoles[i];
+        const card = document.createElement("div");
+        card.className = "role-card";
+        card.innerHTML = `<div class="player-name">${player}</div>
+                          <img src="${role.img}" alt="${role.name}">
+                          <div>${role.name}</div>`;
+        resultDiv.appendChild(card);
+      });
+    }
+
+    function savePlayers() {
+      playersList = document.getElementById("playerInput").value
+        .split("\n").map(p => p.trim()).filter(p => p !== "");
+      updateNightSelects();
+    }
+
+    function updateNightSelects() {
+      $(".player-select").each(function() {
+        const currentVal = $(this).val();
+        $(this).empty().append(`<option></option>`);
+        playersList.forEach(p => {
+          $(this).append(`<option value="${p}">${p}</option>`);
+        });
+        $(this).val(currentVal).trigger("change");
+      });
+    }
+
+    function createNightTable(number, allowDelete = true) {
+      const nightDiv = document.createElement("div");
+      nightDiv.className = "night-box";
+      nightDiv.innerHTML = `
+        <div class="night-header">
+          <h3>Đêm ${number}</h3>
+          ${allowDelete ? `<button class="delete-btn" onclick="deleteNight(this)">❌ Xóa đêm</button>` : ""}
+        </div>
+        <table>
+          <tr>
+            <th>Bảo vệ</th><th>Sói</th><th>Phù thủy</th><th>Tiên tri</th><th>Thợ săn</th>
+            <th><input type="text" placeholder="Ghi chú 1"></th>
+            <th><input type="text" placeholder="Ghi chú 2"></th>
+          </tr>
+          <tr>
+            ${["Bảo vệ","Sói","Phù thủy","Tiên tri","Thợ săn"].map(()=>`
+              <td><select class="player-select"><option></option>
+              ${playersList.map(p=>`<option>${p}</option>`).join("")}</select></td>
+            `).join("")}
+            <td><input type="text"></td>
+            <td><input type="text"></td>
+          </tr>
+        </table>
+      `;
+      return nightDiv;
+    }
+
+    function addNight() {
+      nightCount++;
+      const container = document.getElementById("nightsContainer");
+      const allowDelete = nightCount > 3;
+      const newNight = createNightTable(nightCount, allowDelete);
+      container.appendChild(newNight);
+      $(newNight).find(".player-select").select2({ width: "100%", placeholder: "Chọn người chơi" });
+    }
+
+    function deleteNight(btn) {
+      btn.closest(".night-box").remove();
+    }
+
+    window.onload = function () {
+      for (let i = 1; i <= 3; i++) addNight();
+    };
+  </script>
+</body>
+</html>
