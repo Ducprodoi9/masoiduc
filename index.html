@@ -10,9 +10,9 @@
     button { margin-top: 10px; padding: 8px 15px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
     button:hover { background: #0056b3; }
     .roles-container { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; }
-    .role-option { border: 2px solid #ccc; border-radius: 8px; text-align: center; padding: 5px; width: 100px; cursor: pointer; background: white; transition: 0.2s; }
+    .role-option { border: 2px solid #ccc; border-radius: 5px; text-align: center; padding: 3px; width: 10%; cursor: pointer; background: white; transition: 0.2s; }
     .role-option:hover { border-color: #007bff; transform: scale(1.05); }
-    .role-option img { width: 80px; height: 80px; object-fit: contain; margin: 0 auto 5px; display: block; }
+    .role-option img { width: 95%; height: 60%; object-fit: contain; margin: 0 auto 5px; display: block; }
     .roles-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; margin-top: 20px; }
     .role-card { border: 1px solid #ccc; border-radius: 10px; padding: 10px; text-align: center; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.1); font-size: 16px; }
     .role-card img { width: 70px; height: 70px; object-fit: contain; margin-bottom: 8px; }
@@ -35,8 +35,8 @@
       border-radius: 10px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
-    .players-section { width: 30%; }
-    .roles-section { width: 70%; }
+    .players-section { width: 20%; }
+    .roles-section { width: 80%; }
 
     /* Màu header theo vai trò */
     th { color: #fff; font-weight: bold; }
@@ -56,13 +56,13 @@
   <!-- Người chơi + Chọn vai trò -->
   <div class="top-section">
     <!-- Người chơi -->
-    <div class="players-section">
+    <div class="players-section" style="height: 400px;">
       <div class="section-title">1️⃣ Người chơi</div>
-      <textarea id="playerInput" rows="12" placeholder="Nhập tên người chơi, mỗi dòng 1 tên"></textarea>
+      <textarea id="playerInput" rows="12" placeholder="Nhập tên người chơi, mỗi dòng 1 tên" style="width: 90%;height: 80%;"></textarea>
     </div>
 
     <!-- Chọn vai trò -->
-    <div class="roles-section">
+    <div class="roles-section" style="">
       <div class="section-title">2️⃣ Chọn vai trò</div>
       <div class="roles-container" id="roleSelection"></div>
     </div>
